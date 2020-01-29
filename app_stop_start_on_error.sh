@@ -1,9 +1,8 @@
-root@su583aos # cat /srvappli/wasadm/fmo_start_stop.sh
 # script: fmo_weekend_check.sh                                               #
-# Author: Vijender for Accenture                                             #
-# Modified by : Sudip Kumar Mondal for Accenture
+# Author:                                             #
+# Modified by : 
 # Version: v1.0                                                              #
-# Requirement: check MQ_INSTALL_ROOT for FMO on sunday                       #
+# Requirement:                   #
 #########################################################e####################
 
 set -x
@@ -11,8 +10,8 @@ set -x
 mail_KO_alert()
 {
 /usr/sbin/sendmail -t << EOM
-To: IO.RN.MIDDLEWARE.Midrange@accenture.com,sandipan.roy@accenture.com,sayak.mukherjee@accenture.com
-Subject: FMO weekend check
+To: vijen2000@gmail.com
+Subject: APP weekend check
 
 Hi,
 
@@ -21,7 +20,6 @@ We found below errors in the SystemOut.log
 `cat /tmp/fmo_script/temp.log`
 
 Thanks & Regards,
-Accenture Middleware Team
 
 EOM
 }
@@ -29,7 +27,7 @@ EOM
 mail_OK_alert()
 {
 /usr/sbin/sendmail -t << EOM
-To: IO.RN.MIDDLEWARE.Midrange@accenture.com,sandipan.roy@accenture.com,sayak.mukherjee@accenture.com
+To: vijen2000@gmai.com
 Subject: FMO weekend check
 
 Hi,
@@ -37,7 +35,6 @@ Hi,
 There is no error found in the logs. Application server is OK
 
 Thanks & Regards,
-Accenture Middleware Team
 
 EOM
 }
