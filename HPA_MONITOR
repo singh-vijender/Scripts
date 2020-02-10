@@ -1,0 +1,133 @@
+config.cfg
+
+K8SNEW1:AL_Set_1:host38911:/home/enabler/.kube/admin.conf:
+K8SNEW1:AL_Set_2:host40245:/home/enabler/.kube/admin.conf:
+K8SNEW1:DL_Set_1:host10990:/home/enabler/.kube/admin.conf:
+K8SNEW1:DL_Set_2:host10282:/home/enabler/.kube/admin.conf:
+K8SNEW1:FF_set_1:host39195:/home/enabler/.kube/admin.conf:
+K8SNEW1:FF_set_2:host39423:/home/enabler/.kube/admin.conf:
+#K8SNEW1:SSAF_FF:host28652.vci.company.com:/home/enabler/.kube/admin.conf:
+#K8SNEW1:SSAF_AL:host30574.vci.company.com:/home/enabler/.kube/admin.conf:
+#K8SNEW1:SSAF_DL:host30664.vci.company.com:/home/enabler/.kube/admin.conf:
+
+HTML_LOC:/opt/httpserver/htdocs/HPA_MONITOR
+
+ONLY:NAMESPACE:com-company-idp:
+
+EXCLUDE:deployment:Evicted:
+EXCLUDE:deployment:cassandra:
+EXCLUDE:deployment:Completed:
+EXCLUDE:deployment:dns-test:
+EXCLUDE:deployment:kube-proxy:
+EXCLUDE:deployment:prometheus-config:
+EXCLUDE:deployment:curator-deploy:
+EXCLUDE:deployment:netchecker-server:
+EXCLUDE:deployment:kubernetes-dashboard:
+EXCLUDE:deployment:glusterfs:
+EXCLUDE:deployment:jaeger:
+
+KEYWORD:master=true:MASTER
+KEYWORD:SchedulingDisabled:CORDON
+KEYWORD:role=idpnginxplus:INTRANET_NGINX
+KEYWORD:role-bttw=WMAuditConsumerMs:WMAuditConsumerMs_NODE
+
+NEEDMAIL:false:
+MAILFROM:DL-alerts@company.com:
+MAILLIST:DL@company.com:
+MAILSUB:[MONITOR] Horizontal auto scaling HEALTH_MONITOR:
+
+
+Main.sh
+#!/bin/bash
+### get currnet location
+LOC=`dirname $0`
+CONF=${LOC}/config.cfg
+
+cd ${LOC}
+./N1*.sh
+./N2*.sh
+./N3*.sh
+
+
+N1_HPA_Monitor.sh
+#!/bin/bash
+### get currnet location
+LOC=`dirname $0`
+CONF=${LOC}/config.cfg
+
+HPA_DUMP=${LOC}/hpa_dump.txt
+cat /dev/null > $HPA_DUMP
+
+for line in `grep ^K8S ${CONF}`
+do
+  DC=`echo $line |cut -d':' -f2`
+  SERVER=`echo $line |cut -d':' -f3`
+  ADMINCONF=`echo $line |cut -d':' -f4`
+
+  /usr/local/bin/sshcmd -u enabler -s $SERVER -q -r HPA_collector.sh  > ${LOC}/${SERVER}_hpa_filter.txt
+  while read ln
+  do
+    echo "${DC}|${SERVER}|$ln"
+  done < ${LOC}/${SERVER}_hpa_filter.txt >> $HPA_DUMP
+
+done
+
+
+#!/bin/bash
+### get currnet location
+LOC=`dirname $0`
+CONF=${LOC}/config.cfg
+HPA_DUMP=${LOC}/hpa_dump.txt
+
+DC_LIST=${LOC}/DC_LIST2.txt
+HPA_LIST=${LOC}/HPA_LIST2.txt
+
+cat $HPA_DUMP | cut -d'|' -f1 | sort | uniq > $DC_LIST
+cat $HPA_DUMP | grep 'DATA: ' | cut -d'|' -f5 | sort | uniq  > $HPA_LIST
+
+
+N3_html_generator.sh
+#!/bin/bash
+### get currnet location
+LOC=`dirname $0`
+CONF=${LOC}/config.cfg
+HPA_DUMP=${LOC}/hpa_dump.txt
+
+DC_LIST=${LOC}/DC_LIST2.txt
+HPA_LIST=${LOC}/HPA_LIST2.txt
+
+HTML_HOME=`grep ^HTML_LOC ${CONF} | cut -d':' -f 2 `
+FINAL_HTML=${LOC}/FINAL2.html
+APH_HOME=`basename $HTML_HOME`
+
+mkdir -p $HTML_HOME 2>/dev/null
+cat /dev/null > $FINAL_HTML
+
+echo "<html><head><meta http-equiv=refresh content=60></head><body>" >> $FINAL_HTML
+echo "<table border=1>" >> $FINAL_HTML
+
+for hpa in `cat $HPA_LIST`
+do
+  HTMLLINE="<tr><td>$hpa</td><td>DC<br>MIN<br>MAX<br>current<br>svc_ver</td>"
+  for dc in `cat $DC_LIST`
+  do
+    LINE=`grep 'DATA: ' $HPA_DUMP | grep "|${hpa}|" | grep $dc`
+    #echo $LINE | cut -d'|' -f6-
+    HTMLLINE_TEMP=`echo $LINE | cut -d'|' -f6-9 | sed 's/|/<br>/g'`
+    DEPCNT=`echo $LINE | cut -d'|' -f10`
+    HTMLLINE="${HTMLLINE}<td valign=top align=center>-- ${dc}[${DEPCNT}]--<br>${HTMLLINE_TEMP}</td>"
+  done
+  HTMLLINE="${HTMLLINE}</tr>"
+  echo $HTMLLINE >> $FINAL_HTML
+done
+
+echo "</table>" >> $FINAL_HTML
+
+for dc in `cat $DC_LIST`
+do
+  echo "<h3> $dc </h3>" >> $FINAL_HTML
+  grep 'MSG: ' $HPA_DUMP | grep $dc | sed 's/.*MSG: /<br>/' >> $FINAL_HTML
+done
+
+echo "</body></html>" >> $FINAL_HTML
+cp $FINAL_HTML $HTML_HOME
