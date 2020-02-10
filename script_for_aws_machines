@@ -1,0 +1,47 @@
+#!/bin/bash
+yum update -y
+yum install httpd -y
+systemctl start httpd.service
+systemctl enable httpd.service
+cd /var/www/html
+echo "Hello World" > index.html
+
+
+
+#!/bin/bash
+yum update -y
+yum install httpd -y
+systemctl start httpd.service
+systemctl enable httpd.service
+cd /var/www/html
+echo "<head>" > index.html
+echo "        <meta charset="utf-8">" >> index.html
+echo "        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">" >> index.html
+echo "        <title></title>" >> index.html
+echo "        <meta name="description" content="">" >> index.html
+echo "        <meta name="viewport" content="width=device-width, initial-scale=1">" >> index.html
+echo "        <link rel="stylesheet" href="css/main.css">" >> index.html
+echo "    </head>" >> index.html
+echo "    <body>" >> index.html
+echo "        <p>Hello world</p>" >> index.html
+echo "        <p>Hostname: $(hostname -f)</p>" >> index.html
+echo "</body>" >> index.html
+
+
+echo "<head>" > index.html
+echo "        <meta charset="utf-8">" >> index.html
+echo "        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">" >> index.html
+echo "        <title></title>" >> index.html
+echo "        <meta name="description" content="">" >> index.html
+echo "        <meta name="viewport" content="width=device-width, initial-scale=1">" >> index.html
+echo "        <link rel="stylesheet" href="css/main.css">" >> index.html
+echo "    </head>" >> index.html
+echo "    <body>" >> index.html
+echo "        <p>Hello world</p>" >> index.html
+echo "        <p>Hostname: $(hostname -f)</p>" >> index.html
+echo "        <p>Date/Time: <span id="datetime"></span></p>" >> index.html
+echo "        <script>" >> index.html
+echo "                var dt = new Date();" >> index.html
+echo "                document.getElementById("datetime").innerHTML = dt.toLocaleString();" >> index.html
+echo "        </script>" >> index.html
+echo "</body>" >> index.html
