@@ -1,0 +1,72 @@
+SERVERLIST
+
+host38911.vci.att.com
+host40245.vci.att.com
+host10990.vci.att.com
+host10282.vci.att.com
+host39195.vci.att.com
+host39423.vci.att.com
+
+config.cfg
+K8S:FF_set_1:host39195.vci.att.com
+K8S:FF_Set_2:host39423.vci.att.com
+K8S:AL_Set_1:host38911.vci.att.com
+K8S:AL_Set_2:host40245.vci.att.com
+K8S:DL_Set_1:host10990.vci.att.com
+K8S:DL_Set_2:host10282.vci.att.com
+
+NEEDMAIL:true:
+MAILFROM:DL-alerts@company.com
+#MAILLIST:rb1277@att.com :
+MAILLIST:DL@company.com
+MAILSUB:[MONITOR] OOMemory error detection :
+
+
+
+#!/bin/sh
+LOC=`dirname $0`
+CONF=${LOC}/config.cfg
+
+MAILNEED=`grep ^NEEDMAIL ${CONF} | cut -d':' -f 2 `
+MAILLIST=`grep ^MAILLIST ${CONF} | cut -d':' -f 2 `
+MAILSUB=`grep ^MAILSUB ${CONF} | cut -d':' -f 2 `
+FMAIL=`grep ^MAILFROM ${CONF} | cut -d':' -f 2 `
+
+cat /dev/null > result
+cat /dev/null > FINAL.html
+for cnfln in `grep ^K8S config.cfg`
+do
+  DC_NAME=`echo $cnfln | cut -d':' -f2`
+  SERVER=`echo $cnfln | cut -d':' -f3`
+  /usr/local/bin/sshcmd -u enabler -s $SERVER -q -r findREASON.sh > FRtemp.txt
+  while read ln
+  do
+    echo "$DC_NAME $ln " | tr -s " " >> result
+  done < FRtemp.txt
+  rm FRtemp.txt
+done
+
+grep OOMK result | sed 's/ *$//' | sed 's: :</td><td>:g' > result1
+
+echo "<h4>Checking all pods which are curretnly running, but got restaretd more than 5 times.... trying to find if there are OutOfMemory and how much memory is assigned</h4><br><br>" >> FINAL.html
+echo "<table border=1 width=100%>" >> FINAL.html
+echo "<tr><th>DC_NAME</th><th>Namespace</th><th>PODS</th><th>CONTAINER</th><th>REASON</th><th>Assigned Memory</th></tr>" >> FINAL.html
+while read ht
+do
+  echo "<tr><td>$ht</td></tr>" >>FINAL.html
+done < result1
+echo "</table>" >> FINAL.html
+
+#rm result1 result
+############## Email logic #########################
+
+if [ "X${MAILNEED}" == "Xtrue" ];then
+(
+echo "From: $FMAIL "
+echo "To: $MAILLIST "
+echo "MIME-Version: 1.0"
+echo "Subject: $MAILSUB"
+echo "Content-Type: text/html"
+cat FINAL.html
+) | /usr/sbin/sendmail -t
+fi
