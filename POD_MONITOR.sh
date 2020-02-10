@@ -720,35 +720,34 @@ fi
 
 config.cfg
 
-
-#K8SOLD1:OLD_ALDC:zlp04006:/home/enabler/.kube/admin.conf_local:
-K8SNEW1:AL_Set_1:zlp38911:/home/enabler/.kube/admin.conf:
-K8SNEW1:AL_Set_2:zlp40245:/home/enabler/.kube/admin.conf:
-#K8SOLD1:DLD_C1:zlp39378:/home/enabler/.kube/admin.conf:
-K8SNEW1:DL_Set_1:zlpy10990:/home/enabler/.kube/admin.conf:
-K8SNEW1:DL_Set_2:zlpy10282:/home/enabler/.kube/admin.conf:
-#K8SOLD1:FF1:zlp29035:/home/enabler/.kube/admin.conf:
-K8SNEW1:FF_set_1:zlp39195:/home/enabler/.kube/admin.conf:
-K8SNEW1:FF_set_2:zlp39423:/home/enabler/.kube/admin.conf:
-#K8SNEW1:ALD_C2:zlp38911:/home/enabler/.kube/admin.conf:
+#K8SOLD1:OLD_ALDC:host04006:/home/enabler/.kube/admin.conf_local:
+K8SNEW1:DATACENTER:Server:PATH_TO_admin.conf:
+K8SNEW1:AL_Set_1:host38911:/home/enabler/.kube/admin.conf:
+K8SNEW1:AL_Set_2:host40245:/home/enabler/.kube/admin.conf:
+#K8SOLD1:DLD_C1:host39378:/home/enabler/.kube/admin.conf:
+K8SNEW1:DL_Set_1:hosty10990:/home/enabler/.kube/admin.conf:
+K8SNEW1:DL_Set_2:hosty10282:/home/enabler/.kube/admin.conf:
+#K8SOLD1:FF1:host29035:/home/enabler/.kube/admin.conf:
+K8SNEW1:FF_set_1:host39195:/home/enabler/.kube/admin.conf:
+K8SNEW1:FF_set_2:host39423:/home/enabler/.kube/admin.conf:
+#K8SNEW1:ALD_C2:host38911:/home/enabler/.kube/admin.conf:
 ##### log file ######
 LOGFILE:log.log:
 #### Mail configuration ######
 MAIL:MAIL_ENABLE:true:
-MAIL:MAILLIST:DL-IDPENVMGMT@att.com rb1277@att.com dl-IDP-alert@list.att.com
-#MAIL:MAILLIST:rb1277@att.com
+MAIL:MAILLIST:DL-@company.com rb1277@company.com dl-IDP-alert@list.company.com
 MAIL:ONLYHOURLY:false:
 #### Snooze keywords ######
 SNOOZE:ALERT:billms:
 #SNOOZE:ALERT:edgeprofilefileprocessms:
 #### Apache home ######
-HTML_HOME:hostlocation:/opt/app/workload/httpserver/htdocs/POD_MONITOR_V3
+HTML_HOME:hostlocation:/opt/httpserver/htdocs/POD_MONITOR_V3
 ##### skip keyworkds ######
-SKIP:NAMESPACE:com-att-elkpaas:
+SKIP:NAMESPACE:com-company-elkpaas:
 SKIP:NAMESPACE:kube-system:
-SKIP:NAMESPACE:com-att-ocnp-mgm:
-SKIP:NAMESPACE:com-att-roster-prod:
-SKIP:NAMESPACE:com-att-cpfmon:
+SKIP:NAMESPACE:com-company-ocnp-mgm:
+SKIP:NAMESPACE:com-company-roster-prod:
+SKIP:NAMESPACE:com-company-cpfmon:
 SKIP:deployment:catalogms:
 SKIP:deployment:certman-ingress:
 SKIP:deployment:deployment-demo:
@@ -848,7 +847,7 @@ HIGHLIGHT:DEPLOYMENT:manageservicems:5:
 HIGHLIGHT:DEPLOYMENT:masterdescriptionmgmtapi:5:
 HIGHLIGHT:DEPLOYMENT:mdsatgms:10:
 HIGHLIGHT:DEPLOYMENT:mktg-app-shell:10:
-HIGHLIGHT:DEPLOYMENT:myatt-app-shell:5:
+HIGHLIGHT:DEPLOYMENT:mycompany-app-shell:5:
 HIGHLIGHT:DEPLOYMENT:offersms:20:
 HIGHLIGHT:DEPLOYMENT:omhub-app-shell:5:
 HIGHLIGHT:DEPLOYMENT:onemapms:5:
@@ -903,7 +902,7 @@ HIGHLIGHT:DEPLOYMENT:apporigin-nginx:8:
 HIGHLIGHT:DEPLOYMENT:notesms:5:
 HIGHLIGHT:DEPLOYMENT:notificationhistoryms-001:5:
 HIGHLIGHT:DEPLOYMENT:personalizationmetadatams-001:5:
-HIGHLIGHT:DEPLOYMENT:profileattributemapms-001:5:
+HIGHLIGHT:DEPLOYMENT:profilecompanyributemapms-001:5:
 HIGHLIGHT:DEPLOYMENT:qrcodegenerator:5:
 HIGHLIGHT:DEPLOYMENT:qrcodeviewer:1:
 HIGHLIGHT:DEPLOYMENT:retailcaredeliveryoptionsms:5:
@@ -918,7 +917,6 @@ HIGHLIGHT:DEPLOYMENT:wirelessinstallmentplanms:5:
 HIGHLIGHT:DEPLOYMENT:unifiedcustomerservice:5:
 HIGHLIGHT:DEPLOYMENT:manageadjustmentms:5:
 HIGHLIGHT:DEPLOYMENT:products-and-services-ui:25:
-HIGHLIGHT:DEPLOYMENT:p13n-data-check-nodems-001:5:
 ######### POP element on top of result #################
 POP:OPUS:loginms:
 POP:OPUS:repsearchms:
