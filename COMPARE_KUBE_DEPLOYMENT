@@ -1,0 +1,174 @@
+Main.sh
+
+./1*sh
+./2*.sh
+/bin/sh -vx ./3*.sh > /tmp/comparedeployment.log 2>&1
+./4*.sh
+#rm ./skipper.txt ./dep.dump ./DEPLOYMENTLIST ./DCLIST1 ./MAINDUMP
+
+2_filter.sh
+
+./1*sh
+./2*.sh
+/bin/sh -vx ./3*.sh > /tmp/comparedeployment.log 2>&1
+./4*.sh
+#rm ./skipper.txt ./dep.dump ./DEPLOYMENTLIST ./DCLIST1 ./MAINDUMP
+[enabler@zlp12380 COMPARE_DEPLOYMENT_V3]$ cat 1_Collect_raw_dump_and_basic_format.sh
+#!/bin/bash
+### get currnet location
+LOC=`dirname $0`
+CONF=${LOC}/config.cfg
+LOG=${LOC}/`grep ^LOGFILE ${CONF} | cut -d':' -f2`
+#SVC_DUMP=${LOC}/svc.dump
+#DEP_DUMP=${LOC}/single_source.txt
+SVC_DUMP=${LOC}/svc.dump
+DEP_DUMP=${LOC}/dep.dump
+
+cat /dev/null > ${SVC_DUMP}
+cat /dev/null > ${DEP_DUMP}
+
+for line in `grep ^K8S ${CONF}`
+do
+  DC=`echo $line |cut -d':' -f2`
+  SERVER=`echo $line |cut -d':' -f3`
+  ADMINCONF=`echo $line |cut -d':' -f4`
+
+  #DEPCMD="export PATH=/usr/local/bin:\$PATH; export KUBECONFIG=${ADMINCONF}; kubectl get deploy -o custom-columns=NAME:.metadata.name,NS:.metadata.namespace,ResourceVersion:.metadata.resourceVersion,SEED:.metadata.labels.seed,Image:.spec.template.spec.containers[0].image  --all-namespaces --no-headers ;"
+
+  SVCCMD="export PATH=/usr/local/bin:\$PATH; export KUBECONFIG=${ADMINCONF};kubectl get svc --all-namespaces --show-labels | grep 'role=' | grep -v -e '-green' -e '-blue' | tr -s ' ' | tr ' ' ',' | cut -d',' -f2,10 | grep -e green -e blue"
+  ### pulling data
+  /usr/local/bin/sshcmd -u enabler -s $SERVER -q "$SVCCMD" >  ${LOC}/${SERVER}_svc_temp.txt
+
+  while read ln
+  do
+    echo "${DATE}|${DC}|${SERVER}|$ln"
+  done < ${LOC}/${SERVER}_svc_temp.txt >> ${SVC_DUMP}
+
+  DEPCMD="export PATH=/usr/local/bin:\$PATH; export KUBECONFIG=${ADMINCONF}; kubectl get deploy -o custom-columns=NAME:.metadata.name,NS:.metadata.namespace,ResourceVersion:.metadata.resourceVersion,SEED:.metadata.labels.seed,Image:.spec.template.spec.containers[0].image  --all-namespaces --no-headers ;"
+
+  ### pulling data
+  /usr/local/bin/sshcmd -u enabler -s $SERVER -q "$DEPCMD" >  ${LOC}/${SERVER}_dep_temp.txt
+
+  sed -i -e 's/<none>/NA/g' ${LOC}/${SERVER}_dep_temp.txt
+  cat ${LOC}/${SERVER}_dep_temp.txt | tr -s " " > ${LOC}/${SERVER}_dep_filter.txt
+  sed -i -e 's/ /|/g'  ${LOC}/${SERVER}_dep_filter.txt
+
+  while read ln
+  do
+    echo "${DATE}|${DC}|${SERVER}|$ln"
+  done < ${LOC}/${SERVER}_dep_filter.txt >> ${DEP_DUMP}
+
+  ### clean up
+  rm ${LOC}/${SERVER}_dep_temp.txt ${LOC}/${SERVER}_dep_filter.txt
+  #############################################
+done
+
+
+
+3_compare_Image_and_generate_html.sh
+
+
+#!/bin/bash
+### get currnet location
+LOC=`dirname $0`
+CONF=${LOC}/config.cfg
+LOG=${LOC}/`grep ^LOGFILE ${CONF} | cut -d':' -f2`
+HTML_HOME=`grep ^HTML_HOME ${CONF} | cut -d':' -f3`
+TEMP_HTML=${LOC}/full_report.html
+FINAL_HTML=${LOC}/result.html
+ALERT_MS_LIST=${LOC}/MS_in_alert.txt
+ALERT_MS_HTML=${LOC}/MS_alert.html
+ALERT_MS_HTML_TEMP=${LOC}/MS_alert_temp.html
+TEMP=${LOC}/justtemp
+GRAY='#F8F8F8'
+
+cut -d'|' -f4 dep.dump | sort | uniq > ${LOC}/MSLIST.txt
+cut -d'|' -f2 dep.dump | sort | uniq > ${LOC}/DC_LIST.txt
+cat /dev/null > $ALERT_MS_LIST
+cat /dev/null > $ALERT_MS_HTML
+date >> $ALERT_MS_HTML
+
+mkdir -p $HTML_HOME 2>/dev/null
+
+MAILNEED=`grep ^NEEDMAIL ${CONF} | cut -d':' -f 2 `
+MAILLIST=`grep ^MAILLIST ${CONF} | cut -d':' -f 2 `
+MAILSUB=`grep ^MAILSUB ${CONF} | cut -d':' -f 2 `
+
+cut -d'|' -f 4 ${LOC}/dep.dump | sort | uniq | grep -v -e '-green' -e '-blue' > ${LOC}/MSLIST
+cut -d'|' -f 2 ${LOC}/dep.dump | sort | uniq | grep -v -e '-green' -e '-blue' > ${LOC}/DCLIST
+
+
+while read ln
+do
+  echo
+  CHECK="FIRSTRUN"
+  ALERT="NO"
+  echo $ln
+  cat /dev/null >$ALERT_MS_HTML_TEMP
+
+  while read dc in
+  do
+    SVCLINE=`grep  -w $ln ${LOC}/svc.dump| grep $dc`
+    GBCOLOR=`echo $SVCLINE | cut -d'=' -f2`
+    #echo $SVCLINE
+    #echo $GBCOLOR
+
+    if [ "X${GBCOLOR}" != "X" ]; then
+      NEWLN=${ln}-${GBCOLOR}
+    else
+      NEWLN=${ln}
+      GBCOLOR="black"
+    fi
+
+    DATALINE_TEMP=""
+    DATALINE_TEMP=`grep ${dc} dep.dump | grep  "|${NEWLN}|"`
+    DATALINE="|${GBCOLOR}${DATALINE_TEMP}"
+    echo $DATALINE
+
+    VER=`echo $DATALINE | awk -F '|' '{print $9}'`
+    #echo $DATALINE | awk -F '|' '{print "<tr bgcolor="$2"><td>"$3"</td><td>"$9"</td></tr>"}' >>$ALERT_MS_HTML
+
+    if [ "$CHECK" != "FIRSTRUN" ]; then
+      if [ "X$VER" != "X" ] && [ "X$CHECK" != "X" ]; then
+        if [ "$VER" != "$CHECK" ];then
+          ALERT="YES"
+        fi
+      fi
+    else
+      CHECK=$VER
+    fi
+
+    if [ "$GRAY" == "#E0E0E0" ];then
+      GRAY='#F8F8F8'
+      echo $DATALINE | awk -F '|' '{print "<tr bgcolor=ZZZZZ><td>"$3"</td><td><font color="$2">"$9"</font></td></tr>"}' | sed "s/ZZZZZ/${GRAY}/" >>$ALERT_MS_HTML_TEMP
+    else
+      GRAY='#E0E0E0'
+      echo $DATALINE | awk -F '|' '{print "<tr bgcolor=ZZZZZ><td>"$3"</td><td><font color="$2">"$9"</font></td></tr>"}' | sed "s/ZZZZZ/${GRAY}/" >>$ALERT_MS_HTML_TEMP
+    fi
+
+  done < ${LOC}/DCLIST
+
+  echo "ALERT : $ALERT "
+  if [ "$ALERT" == "NO" ];then
+    echo "<table border=1><tr><td></td><td>$ln</td></tr>" >>$ALERT_MS_HTML
+    cat $ALERT_MS_HTML_TEMP >> $ALERT_MS_HTML
+    echo "</table><br>" >> $ALERT_MS_HTML
+  else
+    echo "<table border=1><tr><td></td><td bgcolor=red>$ln</td></tr>" >>$ALERT_MS_HTML
+    cat $ALERT_MS_HTML_TEMP >> $ALERT_MS_HTML
+    echo "</table><br>" >> $ALERT_MS_HTML
+  fi
+done < ${LOC}/MSLIST
+cp $ALERT_MS_HTML /opt/app/workload/httpserver/htdocs/RB_TEST/
+cp $ALERT_MS_HTML $HTML_HOME
+
+
+4_cleanup.sh
+
+
+LOC=`dirname $0`
+
+rm ${LOC}/*txt
+rm ${LOC}/*dump
+rm ${LOC}/*html
+rm ${LOC}/*LIST
