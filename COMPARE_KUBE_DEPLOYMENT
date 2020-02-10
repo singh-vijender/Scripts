@@ -1,3 +1,43 @@
+config.cfg
+K8SNEW1:AL_Set_1:zlp38911:/home/enabler/.kube/admin.conf:
+K8SNEW1:AL_Set_2:zlp40245:/home/enabler/.kube/admin.conf:
+K8SNEW1:DL_Set_1:zlpy10990:/home/enabler/.kube/admin.conf:
+K8SNEW1:DL_Set_2:zlpy10282:/home/enabler/.kube/admin.conf:
+K8SNEW1:FF_set_1:zlp39195:/home/enabler/.kube/admin.conf:
+K8SNEW1:FF_set_2:zlp39423:/home/enabler/.kube/admin.conf:
+##### log file ######
+LOGFILE:log.log:
+#### Mail configuration ######
+NEEDMAIL:false:
+MAILFROM:DL@company.com:
+MAILLIST:abc@company.com
+MAILSUB:[Monitor] Image compare between Prod clusters - Test phase:
+#### Apache home ######
+HTML_HOME:hostlocation:/opt/app/workload/httpserver/htdocs/COMPARE_DEPLOYMENT_V3
+##### skip keyworkds ######
+#SKIP:NAMESPACE:com-company-elkpaas:
+#SKIP:NAMESPACE:kube-system:
+#SKIP:NAMESPACE:com-company-ocnp-mgm:
+#SKIP:NAMESPACE:com-company-roster-prod:
+#SKIP:NAMESPACE:com-company-cpfmon:
+####### highlighters ###################################
+#HIGHLIGHT:DEPLOYMENT:loginms:5:
+#HIGHLIGHT:DEPLOYMENT:repsearchms:5:
+#HIGHLIGHT:DEPLOYMENT:retailcardauthorizationms:5:
+#HIGHLIGHT:DEPLOYMENT:directvnoworderms:5:
+#HIGHLIGHT:DEPLOYMENT:idmloginms:40:
+#HIGHLIGHT:DEPLOYMENT:idmprofilems:40:
+#HIGHLIGHT:DEPLOYMENT:configrulems:5:
+#HIGHLIGHT:DEPLOYMENT:edgeprofiledataconsumerms:10:
+######### POP element on top of result #################
+#POP:OPUS:loginms:
+#POP:OPUS:repsearchms:
+#POP:OPUS:retailcardauthorizationms:
+#POP:RBTEST:riskassessmentms:
+#POP:DUMMY:trackingauditconsumerms:
+########################################################
+
+
 Main.sh
 
 ./1*sh
