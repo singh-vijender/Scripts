@@ -1,5 +1,5 @@
 #!/bin/bash
-#This is script to find print fibonacci series
+#This is script to find and print fibonacci series till given number
 echo "Numbers to digits to print from fibbonacci series : "
 read number
 x=0
