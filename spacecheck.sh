@@ -108,8 +108,6 @@ echo  >> mail.txt
 echo "Thanks and Regards," >> mail.txt
 echo "HM_AO_TA" >> mail.txt
 
-mailx -S smtp=GOEFPXPRDCI01 -r noreply@cs.hm.com -s "Status Report of /app utilization on PROD servers" -c dheeraj.s.mooteri@accenture.com -v manuj.kumar@accenture.com, vijender.palsingh@accenture.com, dinesh.a.patel@accenture.com, mayank.c.aggarwal@accenture.com, pawandeep.a.singh@accenture.com, prateek.dhall@accenture.com, v.sachan@accenture.com, prabhat.kumar.mishra@accenture.com < /home/vijender.palsingh/mail.txt
-
-#mailx -S smtp=GOEFPXPRDCI01 -r noreply@cs.hm.com -s "Status Report of /app utilization on PROD servers" -v vijender.palsingh@accenture.com < /home/vijender.palsingh/mail.txt
+mailx -S smtp=smtp01 -r noreply@testing.com -s "Status Report of /app utilization on PROD servers" -c vijen2000@gmail.com < /home/vijender.palsingh/mail.txt
 
 rm -f crossed.txt good.txt crossed_sorted.txt good_sorted.txt
