@@ -1,0 +1,11 @@
+rootfs|223G|128G|96G|58%|/
+none|223G|128G|96G|58%|/dev
+none|223G|128G|96G|58%|/run
+none|223G|128G|96G|58%|/run/lock
+none|223G|128G|96G|58%|/run/shm
+none|223G|128G|96G|58%|/run/user
+cgroup|223G|128G|96G|58%|/sys/fs/cgroup
+C:\|223G|128G|96G|58%|/mnt/c
+D:\|639G|274G|366G|43%|/mnt/d
+E:\|1.0G|19M|1006M|2%|/mnt/e
+F:\|97G|219M|96G|1%|/mnt/f
