@@ -4,13 +4,122 @@
 <style>
 table, th, td {
   border: 1px solid black;
+  border-collapse: collapse;
 }
 </style>
 </head>
 <body>
-<table style=width:100%>
-<h2>Space utilization for the filesystem is as below</h>
-<tr><th>Filesystem</th><th>Size</th><th>Used</th><th>Avail</th><th>Use%</th><th>Mounted</th></tr>
-</table>
+<table style=width:60%>
+<h2>Space utilization for the filesystem is as below</h2>
+<table>
+    <tr>
+      <th>Filesystem</th>
+      <th>Type</th>
+      <th>Size</th>
+      <th>Used</th>
+      <th>Avail</th>
+      <th>Use%</th>
+      <th>Mounted on</th>
+    </tr>
+
+	<tr>
+	<td>rootfs</td>
+	<td>lxfs</td>
+	<td>223G</td>
+	<td>128G</td>
+	<td>96G</td>
+	<td>58%</td>
+	<td>/ </td>
+	</tr>
+	<tr>
+	<td>none</td>
+	<td>tmpfs</td>
+	<td>223G</td>
+	<td>128G</td>
+	<td>96G</td>
+	<td>58%</td>
+	<td>/run/user </td>
+	</tr>
+	<tr>
+	<td>none</td>
+	<td>tmpfs</td>
+	<td>223G</td>
+	<td>128G</td>
+	<td>96G</td>
+	<td>58%</td>
+	<td>/run/shm </td>
+	</tr>
+	<tr>
+	<td>none</td>
+	<td>tmpfs</td>
+	<td>223G</td>
+	<td>128G</td>
+	<td>96G</td>
+	<td>58%</td>
+	<td>/run/lock </td>
+	</tr>
+	<tr>
+	<td>none</td>
+	<td>tmpfs</td>
+	<td>223G</td>
+	<td>128G</td>
+	<td>96G</td>
+	<td>58%</td>
+	<td>/run </td>
+	</tr>
+	<tr>
+	<td>none</td>
+	<td>tmpfs</td>
+	<td>223G</td>
+	<td>128G</td>
+	<td>96G</td>
+	<td>58%</td>
+	<td>/dev </td>
+	</tr>
+	<tr>
+	<td>cgroup</td>
+	<td>tmpfs</td>
+	<td>223G</td>
+	<td>128G</td>
+	<td>96G</td>
+	<td>58%</td>
+	<td>/sys/fs/cgroup </td>
+	</tr>
+	<tr>
+	<td>C:\</td>
+	<td>drvfs</td>
+	<td>223G</td>
+	<td>128G</td>
+	<td>96G</td>
+	<td>58%</td>
+	<td>/mnt/c </td>
+	</tr>
+	<tr>
+	<td>D:\</td>
+	<td>drvfs</td>
+	<td>639G</td>
+	<td>276G</td>
+	<td>364G</td>
+	<td>44%</td>
+	<td>/mnt/d </td>
+	</tr>
+	<tr>
+	<td>E:\</td>
+	<td>drvfs</td>
+	<td>1.0G</td>
+	<td>19M</td>
+	<td>1006M</td>
+	<td>2%</td>
+	<td>/mnt/e </td>
+	</tr>
+	<tr>
+	<td>F:\</td>
+	<td>drvfs</td>
+	<td>97G</td>
+	<td>219M</td>
+	<td>96G</td>
+	<td>1%</td>
+	<td>/mnt/f </td>
+	</tr></table>
 </body>
 </html>
